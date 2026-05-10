@@ -1,5 +1,3 @@
-
-
 "use client"
 
 import { useEffect, useState } from "react"
@@ -105,32 +103,29 @@ export default function HomePage() {
   }, [])
 
   const sendMessage = async () => {
-  if (!input.trim()) return
+    if (!input.trim()) return
 
-  const userMessage = {
-    sender: "USER",
-    text: input,
-  }
+    const userMessage = {
+      sender: "USER",
+      text: input,
+    }
 
-  setMessages((prev) => [...prev, userMessage])
+    setMessages((prev) => [...prev, userMessage])
 
-  const currentInput = input
+    setInput("")
 
-  setInput("")
+    setTyping(true)
 
-  setTyping(true)
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/run-ai"
+      )
 
-  try {
+      const data = await response.json()
 
-    const response = await fetch(
-      "http://127.0.0.1:8000/run-ai"
-    )
-
-    const data = await response.json()
-
-    const aiMessage = {
-      sender: "AI",
-      text: `
+      const aiMessage = {
+        sender: "AI",
+        text: `
 📊 Market Trend: ${data.market.trend}
 
 💰 BTC: $${data.market.bitcoin}
@@ -145,41 +140,28 @@ export default function HomePage() {
 
 🚨 Scam Detection: ${data.scam_detection.scam_status}
 `,
+      }
+
+      setMessages((prev) => [...prev, aiMessage])
+
+    } catch (error) {
+
+      const aiMessage = {
+        sender: "AI",
+        text: "Backend connection failed.",
+      }
+
+      setMessages((prev) => [...prev, aiMessage])
     }
 
-    setMessages((prev) => [...prev, aiMessage])
-
-  } catch (error) {
-
-    const aiMessage = {
-      sender: "AI",
-      text: "Backend connection failed.",
-    }
-
-    setMessages((prev) => [...prev, aiMessage])
+    setTyping(false)
   }
 
-  setTyping(false)
-}
-
   return (
-    <div className="flex bg-[#050816] text-white min-h-screen overflow-hidden">
-      {/* SIDEBAR */}
-      <div className="w-64 bg-[#0B1120] border-r border-cyan-400/10 fixed h-screen p-6 hidden lg:block">
-        <h1 className="text-3xl font-bold text-cyan-400 mb-10">
-          SentinelX AI
-        </h1>
+    <div className="bg-[#050816] text-white min-h-screen overflow-hidden">
 
-        <div className="space-y-4 text-slate-300">
-          <p className="hover:text-cyan-400 cursor-pointer">Dashboard</p>
-          <p className="hover:text-cyan-400 cursor-pointer">Market Analysis</p>
-          <p className="hover:text-cyan-400 cursor-pointer">Risk Engine</p>
-          <p className="hover:text-cyan-400 cursor-pointer">Scam Detection</p>
-          <p className="hover:text-cyan-400 cursor-pointer">AI Logs</p>
-        </div>
-      </div>
+      <main className="flex-1 p-6 lg:p-8">
 
-      <main className="lg:ml-64 flex-1 p-6 lg:p-8">
         {/* HEADER */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-10 gap-6">
           <div>
@@ -214,6 +196,7 @@ export default function HomePage() {
 
         {/* MARKET CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+
           {/* BTC */}
           <motion.div
             whileHover={{ scale: 1.03 }}
@@ -273,6 +256,7 @@ export default function HomePage() {
               Bearish Trend
             </p>
           </motion.div>
+
         </div>
 
         {/* CHART */}
@@ -301,8 +285,10 @@ export default function HomePage() {
 
         {/* MAIN GRID */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-10">
+
           {/* LEFT COLUMN */}
           <div className="xl:col-span-2 space-y-6">
+
             {/* WORKFLOW */}
             <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/10 rounded-3xl p-8">
               <div className="flex items-center gap-3 mb-8">
@@ -383,10 +369,12 @@ export default function HomePage() {
                 ))}
               </div>
             </div>
+
           </div>
 
           {/* RIGHT COLUMN */}
           <div className="space-y-6">
+
             {/* CHATBOT */}
             <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-3xl p-6">
               <h2 className="text-2xl font-bold text-cyan-400 mb-6">
@@ -409,7 +397,7 @@ export default function HomePage() {
 
                     <p className="whitespace-pre-line">
                       {msg.text}
-                     </p>
+                    </p>
                   </div>
                 ))}
 
@@ -424,8 +412,8 @@ export default function HomePage() {
 
               <div className="flex gap-3">
                 <input
-                 onKeyDown={(e) => {
-                 if (e.key === "Enter") sendMessage()
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") sendMessage()
                   }}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -442,7 +430,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* TRADE RECOMMENDATION */}
+            {/* TRADING */}
             <div className="bg-white/5 backdrop-blur-xl border border-green-400/20 rounded-3xl p-8">
               <h2 className="text-2xl font-bold text-green-400 mb-6">
                 Trading Recommendation
@@ -459,7 +447,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* RISK ANALYSIS */}
+            {/* RISK */}
             <div className="bg-white/5 backdrop-blur-xl border border-yellow-400/20 rounded-3xl p-8">
               <h2 className="text-2xl font-bold text-yellow-400 mb-6">
                 Risk Analysis
@@ -474,7 +462,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* SCAM DETECTION */}
+            {/* SCAM */}
             <div className="bg-red-500/10 border border-red-400/20 rounded-3xl p-8">
               <div className="flex items-center gap-3 mb-6">
                 <ShieldAlert className="text-red-400" />
@@ -509,14 +497,14 @@ export default function HomePage() {
 
               <div className="space-y-4 text-slate-300">
                 <p>• Extreme BTC volatility detected</p>
-
                 <p>• Scam token monitoring enabled</p>
-
                 <p>• Portfolio risk increased</p>
               </div>
             </div>
+
           </div>
         </div>
+
       </main>
     </div>
   )
